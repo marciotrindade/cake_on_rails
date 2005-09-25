@@ -1,0 +1,69 @@
+<?php
+   $model = Inflector::pluralize($this->name);
+   //$table = Inflector::underscore(get_class($this->models[strtolower(Inflector::singularize(Inflector::underscore($this->name)))]));
+
+   $modelKey = Inflector::underscore(Inflector::singularize($this->name));
+   $humanName = Inflector::humanize($this->name);
+   $humanSingularName = Inflector::singularize( $humanName );
+//	var_dump( $data );
+?>
+<table class="inav" cellspacing="0">
+    <tr>
+      <?php foreach ( $fieldNames as $fieldName ) { ?> 
+        <th><?php echo $fieldName['prompt'];?></th>
+      <?php } ?>
+         <th>Actions</th>
+    </tr>
+    <?php 
+      $iRowIndex = 0;
+    
+      if( is_array( $data ) ) 
+      {
+         foreach ( $data as $row ) { 
+            if( $iRowIndex++ % 2 == 0 )
+            {
+               echo "<tr>";
+            } else {
+               echo "<tr class='altRow'>";
+            }
+            foreach( $fieldNames as $field=>$value ) { ?>
+               <td>
+                  <?php
+                     if( isset($value['foreignKey']) ) 
+                     {
+                        
+                        //  this is a foreign key, figure out what the display field should be for this model.
+                       $otherModelName = $value['model'];
+                       $otherControllerName = $value['controller']; 
+                       
+                       $registry = ClassRegistry::getInstance();
+                       $otherModelObject = $registry->getObject( $otherModelName );
+                       if( is_object($otherModelObject) ) 
+                       {
+                          $displayText = $row[$otherModelName][ $otherModelObject->getDisplayField() ];
+                       } else{
+                          $displayText = $row[$modelKey][$field];
+                       }  
+                          echo $html->linkTo( $displayText, "/".Inflector::underscore($otherControllerName)."/show/".$row[$modelKey][$field] );
+                       
+                     } else {
+                        echo $row[$modelKey][$field]; 
+                     } ?>
+               </td>
+            <?php } // end for each $fieldNames as $field=>value ?>
+               <td class="listactions"><?php echo $html->linkTo('View',"/".$this->viewPath."/show/{$row[$modelKey]['id']}/")?>
+                   <?php echo $html->linkTo('Edit',"/".$this->viewPath."/edit/{$row[$modelKey]['id']}/")?>
+                  <?php echo $html->linkTo('Delete',"/".$this->viewPath."/destroy/{$row[$modelKey]['id']}/")?>
+                </td>
+   
+         </tr>
+       <?php } // end for each data as row
+      } //  end if( $data )?>
+    
+    
+</table>
+<ul class="actions">
+    <li><?php echo $html->linkTo('New '.$humanSingularName, '/'.$this->viewPath.'/new'); ?></li>
+</ul>
+
+
