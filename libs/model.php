@@ -1349,22 +1349,18 @@ class Model extends Object
                }
                $count++;
            }
-           if(empty($newValue2) && !empty($original))
+           if(empty($newValue) && !empty($original))
            {
                for ($i = 0; $i< count($original); $i++) 
                {
-                   $newValue2[$i] = $original[$i];
-               }
-               if(count($this->_oneToMany < 2))
-               {
-                   $newValue = $newValue2;
+                   $newValue[$i] = $original[$i];
                }
            }
            elseif(!empty($original))
            {
                for ($i = 0; $i< count($original); $i++) 
                {
-                   $newValue[$i]  = array_merge($newValue2[$i], $original[$i]);
+                   $newValue[$i]  = array_merge($newValue[$i], $original[$i]);
                }
            }
            $this->joinedHasMany[] = new NeatArray($this->db->fields($table));
