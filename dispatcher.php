@@ -245,17 +245,47 @@ class Dispatcher extends Object
       $scriptName = $_SERVER['PHP_SELF'];
 
       // if document root ends with 'webroot', it's probably correctly set
-      $r[] = true;
+      $r = null;
       if (preg_match('/\\/app\/webroot(\/)?$/i', $docRoot))
       {
           $this->webroot = null;
-          return preg_match('/\/index.php(.)?$/i', $scriptName, $r)? $base.!empty($r[1]): $base;
+          //return preg_match('/\\/index.php(\/)?$/i', $scriptName, $r)? $base.$r[1]: $base;
+          if (preg_match('/\\/index.php(\/)?$/i', $scriptName, $r))
+          {
+              if(!empty($r[1]))
+              {
+                  return  $base.$r[1];
+              }
+              else
+              {
+                  return $base;
+              }
+          }
+          else
+          {
+              return $base;
+          }
       }
       else
       {
           $this->webroot = $base;
           // document root is probably not set to Cake 'webroot' dir
-          return preg_match('/\\/index.php(\/)?$/i', $scriptName, $r)? $base.!empty($r[1]): $base;
+          //return preg_match('/\\/index.php(\/)?$/i', $scriptName, $r)? $base.$r[1]: $base;
+          if (preg_match('/\\/index.php(\/)?$/i', $scriptName, $r))
+          {
+              if(!empty($r[1]))
+              {
+                  return  $base.$r[1];
+              }
+              else
+              {
+                  return $base;
+              }
+          }
+          else
+          {
+              return $base;
+          }
       }
    }
 
