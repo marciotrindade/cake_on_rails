@@ -338,7 +338,7 @@ class HtmlHelper extends Helper
      */
 	function css($path, $rel = 'stylesheet', $htmlAttributes = null, $return = false)
 	{
-		$url = "{$this->webroot}/".(COMPRESS_CSS? 'c': '')."css/{$path}.css";
+		$url = "{$this->webroot}".(COMPRESS_CSS? 'c': '').CSS_URL.$path.".css";
 		return $this->output(sprintf($this->tags['css'], $rel, $url,
 		$this->parseHtmlOptions($htmlAttributes, null, '', ' ')), $return);
 	}
