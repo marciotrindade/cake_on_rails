@@ -167,7 +167,7 @@ class HtmlHelper extends Helper
 			$output = $this->base.'/'.strtolower($this->params['controller']).'/'.$url;
 		}
 
-		return $this->output(ereg_replace('&([^a])', '&amp;\1', $output), $return);
+		return $this->output(preg_replace('/&([^a])/', '&amp;\1', $output), $return);
 	}
 
 	/**

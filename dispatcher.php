@@ -242,13 +242,17 @@ class Dispatcher extends Object
       $docRoot = $_SERVER['DOCUMENT_ROOT'];
       $scriptName = $_SERVER['PHP_SELF'];
 
-      // if document root ends with 'public', it's probably correctly set
+      // if document root ends with 'webroot', it's probably correctly set
       $r = null;
-      if (ereg('/^.*/app\/webroot(\/)?$/', $docRoot))
-      return preg_match('/^(.*)\/index\.php$/', $scriptName, $r)? $r[1]: false;
+      if (preg_match('/\/^.*\/app\\/webroot(\\/)?$\//', $docRoot))
+      {
+          return  preg_match('/^(.*)\/index\.php$/', $scriptName, $r)? $r[1]: false;
+      }
       else
-      // document root is probably not set to Cake 'public' dir
-      return preg_match('/^(.*)\/app\/webroot\/index\.php$/', $scriptName, $r)? $r[1]: false;
+      {
+          // document root is probably not set to Cake 'public' dir
+          return  preg_match('/^(.*)\/app\/webroot\/index\.php$/', $scriptName, $r)? $r[1]: false;
+      }
    }
 
    
