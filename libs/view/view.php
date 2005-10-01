@@ -196,6 +196,7 @@ class View extends Object
         $this->autoLayout    =& $this->controller->autoLayout;
         $this->autoRender    =& $this->controller->autoRender;
         $this->base          =& $this->controller->base;
+        $this->webroot       =& $this->controller->webroot;
         $this->helpers       =& $this->controller->helpers;
         $this->here          =& $this->controller->here;
         $this->layout        =& $this->controller->layout;
@@ -600,6 +601,7 @@ class View extends Object
              {
                 ${$helper}                       = new $helperCn;
                 ${$helper}->base                 = $this->base;
+                ${$helper}->webroot              = $this->webroot;
                 ${$helper}->here                 = $this->here;
                 ${$helper}->params               = $this->params;
                 ${$helper}->action               = $this->action;

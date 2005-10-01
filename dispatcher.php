@@ -128,6 +128,7 @@ class Dispatcher extends Object
       
       $controller->base        = $this->base;
       $controller->here        = $this->base.'/'.$url;
+      $controller->webroot     = $this->webroot;
       $controller->params      = $params;
       $controller->action      = $params['action'];
       $controller->data        = empty($params['data'])? null: $params['data'];
@@ -234,24 +235,27 @@ class Dispatcher extends Object
  */
    function baseUrl()
    {
-       if (defined('BASE_URL'))
-       {
-           return BASE_URL;
-       }
+       $base = null;
+      if (defined('BASE_URL'))
+      {
+           $base = BASE_URL;
+      }
 
       $docRoot = $_SERVER['DOCUMENT_ROOT'];
       $scriptName = $_SERVER['PHP_SELF'];
 
       // if document root ends with 'webroot', it's probably correctly set
-      $r = null;
-      if (preg_match('/\/^.*\/app\\/webroot(\\/)?$\//', $docRoot))
+      $r[] = true;
+      if (preg_match('/\\/app\/webroot(\/)?$/i', $docRoot))
       {
-          return  preg_match('/^(.*)\/index\.php$/', $scriptName, $r)? $r[1]: false;
+          $this->webroot = null;
+          return preg_match('/\/index.php(.)?$/i', $scriptName, $r)? $base.!empty($r[1]): $base;
       }
       else
       {
-          // document root is probably not set to Cake 'public' dir
-          return  preg_match('/^(.*)\/app\/webroot\/index\.php$/', $scriptName, $r)? $r[1]: false;
+          $this->webroot = $base;
+          // document root is probably not set to Cake 'webroot' dir
+          return preg_match('/\\/index.php(\/)?$/i', $scriptName, $r)? $base.!empty($r[1]): $base;
       }
    }
 

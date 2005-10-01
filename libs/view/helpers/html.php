@@ -338,7 +338,7 @@ class HtmlHelper extends Helper
      */
 	function css($path, $rel = 'stylesheet', $htmlAttributes = null, $return = false)
 	{
-		$url = "{$this->base}/".(COMPRESS_CSS? 'c': '')."css/{$path}.css";
+		$url = "{$this->webroot}/".(COMPRESS_CSS? 'c': '')."css/{$path}.css";
 		return $this->output(sprintf($this->tags['css'], $rel, $url,
 		$this->parseHtmlOptions($htmlAttributes, null, '', ' ')), $return);
 	}
@@ -423,7 +423,7 @@ class HtmlHelper extends Helper
 
     function image($path, $htmlAttributes = null, $return = false)
     {
-        $url = $this->base.IMAGES_URL.$path;
+        $url = $this->webroot.IMAGES_URL.$path;
         $alt = isset($htmlAttributes['alt']) ? $htmlAttributes['alt'] : "";
         return $this->output(sprintf($this->tags['image'], $url, $alt, $this->parseHtmlOptions($htmlAttributes, null, '', ' ')), $return);
     }
