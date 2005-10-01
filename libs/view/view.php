@@ -501,9 +501,9 @@ class View extends Object
 		{
 		    $layoutFileName = LIBS.'view'.DS.'templates'.DS."layouts".DS."{$this->layout}.thtml";
 		}
-		else if(file_exists(LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS."{$this->layout}.thtml"))
+		else if(file_exists(LIBS.'controller'.DS.'templates'.DS.'scaffolds'.DS."{$this->layout}.thtml"))
 		{
-		    $layoutFileName = LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS."{$this->layout}.thtml";
+		    $layoutFileName = LIBS.'controller'.DS.'templates'.DS.'scaffolds'.DS."{$this->layout}.thtml";
 		}
 		return $layoutFileName;
    }

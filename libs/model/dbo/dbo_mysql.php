@@ -35,7 +35,7 @@
 /**
   * Include DBO.
   */
-uses('dbo');
+uses('model'.DS.'dbo'.DS.'dbo');
 
 /**
  * Short description for class.

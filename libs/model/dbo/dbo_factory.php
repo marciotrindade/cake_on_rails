@@ -78,7 +78,7 @@ class DboFactory extends Object
          // special case for AdoDB -- driver name in the form of 'adodb-drivername'
          if (preg_match('#^adodb[\-_](.*)$#i', $config['driver'], $res))
          {
-            uses('dbo/dbo_adodb');
+            uses('model'.DS.'dbo'.DS.'dbo_adodb');
             $config['driver'] = $res[1];
 
             $instance[0] =& new DBO_AdoDB($config);
@@ -86,7 +86,7 @@ class DboFactory extends Object
          // special case for PEAR:DB -- driver name in the form of 'pear-drivername'
          elseif (preg_match('#^pear[\-_](.*)$#i', $config['driver'], $res))
          {
-            uses('dbo/dbo_pear');
+            uses('model'.DS.'dbo'.DS.'dbo_pear');
             $config['driver'] = $res[1];
 
             $instance[0] =& new DBO_Pear($config);
@@ -95,11 +95,11 @@ class DboFactory extends Object
          else
          {
             $db_driver_class = 'DBO_'.$config['driver'];
-            $db_driver_fn = LIBS.strtolower('dbo'.DS.$db_driver_class.'.php');
+            $db_driver_fn = LIBS.strtolower('model'.DS.'dbo'.DS.$db_driver_class.'.php');
 
             if (file_exists($db_driver_fn))
             {
-               uses(strtolower('dbo'.DS.$db_driver_class));
+               uses(strtolower('model'.DS.'dbo'.DS.$db_driver_class));
                $instance[0] =& new $db_driver_class($config);
             }
             else

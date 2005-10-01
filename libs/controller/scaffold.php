@@ -145,7 +145,7 @@ class Scaffold extends Object {
 		$this->controllerClass->params['data'] = $this->controllerClass->models[$this->modelKey]->read();
 		$this->controllerClass->set('data', $this->controllerClass->params['data'] );
 		$this->controllerClass->set('fieldNames', $this->controllerClass->generateFieldNames( $this->controllerClass->params['data'], false ) );
-		$this->controllerClass->render($this->actionView, '', LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS.'show.thtml');
+		$this->controllerClass->render($this->actionView, '', LIBS.'controller'.DS.'templates'.DS.'scaffolds'.DS.'show.thtml');
 	}
 
 	/**
@@ -157,7 +157,7 @@ class Scaffold extends Object {
 	{
 		$this->controllerClass->set('fieldNames', $this->controllerClass->generateFieldNames(null,false) );
 		$this->controllerClass->set('data', $this->controllerClass->models[$this->modelKey]->findAll());
-		$this->controllerClass->render($this->actionView, '', LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS.'list.thtml');
+		$this->controllerClass->render($this->actionView, '', LIBS.'controller'.DS.'templates'.DS.'scaffolds'.DS.'list.thtml');
 	}
 
 	/**
@@ -168,7 +168,7 @@ class Scaffold extends Object {
 	function _scaffoldNew($params)
 	{
 		$this->controllerClass->set('fieldNames', $this->controllerClass->generateFieldNames() );
-		$this->controllerClass->render($this->actionView, '', LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS.'new.thtml');
+		$this->controllerClass->render($this->actionView, '', LIBS.'controller'.DS.'templates'.DS.'scaffolds'.DS.'new.thtml');
 	}
 
 	/**
@@ -182,7 +182,7 @@ class Scaffold extends Object {
 		//  generate the field names.
 		$this->controllerClass->set('fieldNames', $this->controllerClass->generateFieldNames($this->controllerClass->params['data']) );
 		$this->controllerClass->set('data', $this->controllerClass->params['data']);
-		$this->controllerClass->render($this->actionView, '', LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS.'edit.thtml');
+		$this->controllerClass->render($this->actionView, '', LIBS.'controller'.DS.'templates'.DS.'scaffolds'.DS.'edit.thtml');
 	}
 
 
@@ -204,7 +204,7 @@ class Scaffold extends Object {
 		{
 			$this->controllerClass->set('data', $this->controllerClass->params['data']);
 			$this->controllerClass->validateErrors($this->controllerClass->models[$this->modelKey]);
-			$this->controllerClass->render($this->actionView, '', LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS.'new.thtml');
+			$this->controllerClass->render($this->actionView, '', LIBS.'controller'.DS.'templates'.DS.'scaffolds'.DS.'new.thtml');
 		}
 	}
 

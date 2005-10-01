@@ -34,7 +34,7 @@
 /**
   * Create an include path required PEAR libraries.
   */
-uses('dbo');
+uses('model'.DS.'dbo'.DS.'dbo');
 ini_set('include_path', ini_get('include_path') . PATH_SEPARATOR . PEAR);
 vendor('Pear/DB');
 

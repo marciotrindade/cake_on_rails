@@ -3,8 +3,8 @@
 <head>
 	<title><?php echo $title_for_layout; ?></title>
 	<?php echo $html->charsetTag('UTF-8'); ?>
-	<?php echo $html->cssTag('scaffold'); ?>
-	<?php echo $html->cssTag('forms'); ?>
+	<?php echo $html->cssTag('cake.scaffold'); ?>
+	<?php echo $html->cssTag('cake.forms'); ?>
 </head>
 <body>
 <div id="container">

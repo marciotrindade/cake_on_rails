@@ -34,7 +34,7 @@
 /**
   * Include DBO.
   */
-uses('dbo');
+uses('model'.DS.'dbo'.DS.'dbo');
 
 /**
  * PostgreSQL layer for DBO.
