@@ -286,7 +286,15 @@ class View extends Object
          // check for controller-level view handler
          foreach(array($this->name, 'errors') as $viewDir)
          {
-            $missingViewFileName = VIEWS.$viewDir.DS.Inflector::underscore($errorAction).'.thtml';
+             if(file_exists(VIEWS.$viewDir.DS.Inflector::underscore($errorAction).'.thtml'))
+             {
+                 $missingViewFileName = VIEWS.$viewDir.DS.Inflector::underscore($errorAction).'.thtml';
+             }
+             elseif(file_exists(LIBS.'view'.DS.'templates'.DS.$viewDir."{$errorAction}.thtml"))
+             {
+                 $missingViewFileName = LIBS.'view'.DS.'templates'.DS.$viewDir.DS."{$errorAction}.thtml";
+             }
+            
             $missingViewExists = is_file($missingViewFileName);
             if ($missingViewExists)
             {
@@ -460,13 +468,16 @@ class View extends Object
    {
       $action = Inflector::underscore($action);
       
-      if(file_exists(VIEWS.$this->viewPath.DS."{$action}.thtml"))
+      if(is_file(VIEWS.$this->viewPath.DS.$action.'.thtml'))
       {
-          $viewFileName = VIEWS.$this->viewPath.DS."{$action}.thtml";
+          $viewFileName = VIEWS.$this->viewPath.DS.$action.'.thtml';
       }
-      elseif(file_exists(LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS."{$action}.thtml"))
-      {
-          $viewFileName = LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS."{$action}.thtml";
+      else
+      { 
+          if(is_file(LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml'))
+          {
+              $viewFileName = LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml';
+          }
       }
       
       $viewPath = explode(DS, $viewFileName);
@@ -487,18 +498,21 @@ class View extends Object
  */
    function _getLayoutFileName()
    {
-		if(file_exists(VIEWS."layouts".DS."{$this->layout}.thtml")){
-	   return VIEWS."layouts".DS."{$this->layout}.thtml";
+		if(file_exists(VIEWS."layouts".DS."{$this->layout}.thtml"))
+		{
+		    $layoutFileName = VIEWS."layouts".DS."{$this->layout}.thtml";
 		}
-		elseif(file_exists(LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS."{$this->layout}.thtml")){
-		   return LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS."{$this->layout}.thtml";
+		else if(file_exists(LIBS.'view'.DS.'templates'.DS."layouts".DS."{$this->layout}.thtml"))
+		{
+		    $layoutFileName = LIBS.'view'.DS.'templates'.DS."layouts".DS."{$this->layout}.thtml";
 		}
-		else{//Let allows setting path to other layouts??
-		 return;
+		else if(file_exists(LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS."{$this->layout}.thtml"))
+		{
+		    $layoutFileName = LIBS.'controllers'.DS.'templates'.DS.'scaffolds'.DS."{$this->layout}.thtml";
 		}
-	}
+		return $layoutFileName;
+   }
    
-
 /**
  * Renders and returns output for given view filename with its 
  * array of data.

@@ -89,13 +89,22 @@ function loadControllers ()
   */
 function loadController ($name) 
 {
-   $controller_fn = CONTROLLERS.Inflector::underscore($name).'_controller.php';
-   $helper_fn = HELPERS.Inflector::underscore($name).'_helper.php';
+   //$controller_fn = CONTROLLERS.Inflector::underscore($name).'_controller.php';
+   //$helper_fn = HELPERS.Inflector::underscore($name).'_helper.php';
 
+      if(file_exists(CONTROLLERS.Inflector::underscore($name).'_controller.php'))
+      {
+          $controller_fn = CONTROLLERS.Inflector::underscore($name).'_controller.php';
+      }
+      elseif(file_exists(LIBS.'controller'.DS.Inflector::underscore($name).'_controller.php'))
+      {
+          $controller_fn = LIBS.'controller'.DS.Inflector::underscore($name).'_controller.php';
+      }
+   
    require_once(CAKE.'app_controller.php');
 
-   if (file_exists($helper_fn))
-      require_once($helper_fn);
+   //if (file_exists($helper_fn))
+   //   require_once($helper_fn);
 
    return file_exists($controller_fn)? require_once($controller_fn): false;
 }

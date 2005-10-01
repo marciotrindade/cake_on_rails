@@ -45,7 +45,7 @@
  * @package    cake
  * @subpackage cake.app.controllers
  */
-class PagesController extends PagesHelper{
+class PagesController extends AppController{
    
 /**
  * Enter description here...
