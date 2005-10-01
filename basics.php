@@ -51,7 +51,7 @@ define('YEAR',  365 * DAY);
  */
 function loadModels () 
 {
-   require (APP.'app_model.php');
+   require (CAKE.'app_model.php');
    foreach (listClasses(MODELS) as $model_fn) 
    {
       require_once (MODELS.$model_fn);

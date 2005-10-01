@@ -122,7 +122,7 @@ class File extends Object
       $file = $this->getFullPath();
       if (!($handle = fopen( $file , $mode)))
       {
-         print ("[File] Could not open {$file} with mode $mode!");
+         print ("[File] Could not open $file with mode $mode!");
          return false;
       }
 
@@ -229,7 +229,7 @@ class File extends Object
       {
          if ( !touch( $this->getFullPath() ) )
          {
-            print ("[File] Could not create {$this->getName()}!");
+            print ("[File] Could not create $this->getName()!");
             return false;
          }
          else
@@ -239,7 +239,7 @@ class File extends Object
       }
       else
       {
-         print ("[File] Could not create {$this->getName()}!");
+         print ("[File] Could not create $this->getName()!");
          return false;
       }
    }
