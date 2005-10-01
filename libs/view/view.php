@@ -290,11 +290,16 @@ class View extends Object
              {
                  $missingViewFileName = VIEWS.$viewDir.DS.Inflector::underscore($errorAction).'.thtml';
              }
-             elseif(file_exists(LIBS.'view'.DS.'templates'.DS.$viewDir."{$errorAction}.thtml"))
+             elseif(file_exists(LIBS.'view'.DS.'templates'.DS.$viewDir.DS.Inflector::underscore($errorAction).'.thtml'))
              {
-                 $missingViewFileName = LIBS.'view'.DS.'templates'.DS.$viewDir.DS."{$errorAction}.thtml";
+                 $missingViewFileName = LIBS.'view'.DS.'templates'.DS.$viewDir.DS.Inflector::underscore($errorAction).'.thtml';
              }
-            
+             else
+             {
+                 $missingViewFileName = false;
+             }
+
+
             $missingViewExists = is_file($missingViewFileName);
             if ($missingViewExists)
             {
@@ -304,7 +309,7 @@ class View extends Object
 
          if (strpos($action, 'missingView') === false)
          {
-            $controller = $this;
+            $controller =& $this;
             $controller->missingView = $viewFileName;
             $controller->action      = $action;
             call_user_func_array(array(&$controller, 'missingView'), empty($params['pass'])? null: $params['pass']);
@@ -467,17 +472,14 @@ class View extends Object
    function _getViewFileName($action)
    {
        $action = Inflector::underscore($action);
+
        if(file_exists(VIEWS.$this->viewPath.DS.$action.'.thtml'))
        {
            $viewFileName = VIEWS.$this->viewPath.DS.$action.'.thtml';
        }
-       elseif(file_exists(LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml'))
+       elseif(file_exists(LIBS.'view'.DS.'templates'.DS.'errors'.DS.$action.'.thtml'))
        {
-           $viewFileName = LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml';
-       }
-       else
-       {
-           $viewFileName = VIEWS.$this->viewPath.DS.$action.'.thtml';
+           $viewFileName = LIBS.'view'.DS.'templates'.DS.'errors'.DS.$action.'.thtml';
        }
        
        $viewPath = explode(DS, $viewFileName);
@@ -612,15 +614,17 @@ class View extends Object
              }
              else
              {
-               $error = new AppController();
-               $error->base = $this->base;
-               call_user_func_array(array(&$error, 'missingHelperClass'), $helper);
-               exit();
+                 $error = new AppController();
+                 $error->autoLayout = true;
+                 $error->base = $this->base;
+                 call_user_func_array(array(&$error, 'missingHelperClass'), $helper);
+                 exit();
              }
           }
           else
           {
             $error = new AppController();
+            $error->autoLayout = true;
             $error->base = $this->base;
             call_user_func_array(array(&$error, 'missingHelperFile'), Inflector::underscore($helper));
             exit();

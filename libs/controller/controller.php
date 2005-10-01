@@ -511,7 +511,18 @@ class Controller extends Object
         $this->set('pause', $pause);
         $this->set('page_title', $message);
 
-        $this->render(null,false,VIEWS.'layouts'.DS.'flash.thtml');
+		if(file_exists(VIEWS.'layouts'.DS.'flash.thtml'))
+		{
+		    $flash = VIEWS.'layouts'.DS.'flash.thtml';
+		}
+		else if(file_exists(LIBS.'view'.DS.'templates'.DS."layouts".DS.'flash.thtml'))
+		{
+		    $flash = LIBS.'view'.DS.'templates'.DS."layouts".DS.'flash.thtml';
+		}
+        
+        
+        
+        $this->render(null,false,$flash);
     }
 
     /**
