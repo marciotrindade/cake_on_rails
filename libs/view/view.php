@@ -309,7 +309,7 @@ class View extends Object
 
          if (strpos($action, 'missingView') === false)
          {
-            $controller =& $this;
+            $controller = $this;
             $controller->missingView = $viewFileName;
             $controller->action      = $action;
             call_user_func_array(array(&$controller, 'missingView'), empty($params['pass'])? null: $params['pass']);
@@ -481,6 +481,11 @@ class View extends Object
        {
            $viewFileName = LIBS.'view'.DS.'templates'.DS.'errors'.DS.$action.'.thtml';
        }
+       elseif(file_exists(LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml'))
+       {
+           $viewFileName = LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml';
+       }
+       
        
        $viewPath = explode(DS, $viewFileName);
        $i = array_search('..', $viewPath);
