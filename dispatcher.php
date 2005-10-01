@@ -35,7 +35,7 @@
 /**
  * Add Description
  */
-uses('error_messages', 'object', 'router', 'controller', 'scaffold');
+uses('error_messages', 'object', 'router', '/controller/controller', '/controller/scaffold');
 
 /**
  * Short description for class.

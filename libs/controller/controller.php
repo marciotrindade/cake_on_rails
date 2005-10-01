@@ -32,8 +32,7 @@
 /**
  * Include files
  */
-uses('model', 'inflector', 'folder', 'view', 'helper');
-
+uses('/model/model', 'inflector', 'folder', '/view/view', '/view/helper');
 
 /**
  * Controller

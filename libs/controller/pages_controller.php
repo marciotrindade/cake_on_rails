@@ -72,7 +72,10 @@ class PagesController extends PagesHelper{
       {
          $this->redirect('/');
       }
-
+echo "<pre>";
+print_r($this);
+echo "</pre>";
+die();
       $this->set('page', $path[0]);
       $this->set('subpage', empty($path[1])? null: $path[1]);
       $this->set('title', ucfirst($path[count($path)-1]));

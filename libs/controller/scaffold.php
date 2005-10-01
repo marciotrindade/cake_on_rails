@@ -34,7 +34,7 @@
 /**
   * Enter description here...
   */
-uses('model', 'template', 'inflector', 'object');
+uses('/model/model', 'inflector', 'object');
 
 /**
  * Scaffolding is a set of automatic views, forms and controllers for starting web development work faster.

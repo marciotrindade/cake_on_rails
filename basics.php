@@ -92,7 +92,7 @@ function loadController ($name)
    $controller_fn = CONTROLLERS.Inflector::underscore($name).'_controller.php';
    $helper_fn = HELPERS.Inflector::underscore($name).'_helper.php';
 
-   require_once(APP.'app_controller.php');
+   require_once(CAKE.'app_controller.php');
 
    if (file_exists($helper_fn))
       require_once($helper_fn);
