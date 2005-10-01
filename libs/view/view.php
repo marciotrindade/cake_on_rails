@@ -466,28 +466,23 @@ class View extends Object
  */
    function _getViewFileName($action)
    {
-      $action = Inflector::underscore($action);
-      
-      if(is_file(VIEWS.$this->viewPath.DS.$action.'.thtml'))
-      {
-          $viewFileName = VIEWS.$this->viewPath.DS.$action.'.thtml';
-      }
-      else
-      { 
-          if(is_file(LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml'))
-          {
-              $viewFileName = LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml';
-          }
-      }
-      
-      $viewPath = explode(DS, $viewFileName);
-
-      $i = array_search('..', $viewPath);
-
-      unset($viewPath[$i-1]);
-      unset($viewPath[$i]);
-
-      return '/'.implode('/', $viewPath);
+       $action = Inflector::underscore($action);
+       if(file_exists(VIEWS.$this->viewPath.DS.$action.'.thtml'))
+       {
+           $viewFileName = VIEWS.$this->viewPath.DS.$action.'.thtml';
+       }
+       elseif(file_exists(LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml'))
+       {
+           $viewFileName = LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml';
+       }
+       
+       $viewPath = explode(DS, $viewFileName);
+       $i = array_search('..', $viewPath);
+       unset($viewPath[$i-1]);
+       unset($viewPath[$i]);
+       
+       $return = '/'.implode('/', $viewPath);
+       return $return;
    }
 
 /**
@@ -575,9 +570,18 @@ class View extends Object
      {
         if(in_array($helper, array_keys($loaded)) !== true)
         {
-          $helperFn = LIBS.'helpers'.DS.Inflector::underscore($helper).'.php';
+            $helperFn = VIEWS.'helpers'.DS.Inflector::underscore($helper).'.php';
+            if(file_exists(VIEWS.'helpers'.DS.Inflector::underscore($helper).'.php'))
+            {
+                 $helperFn = VIEWS.'helpers'.DS.Inflector::underscore($helper).'.php';
+            }
+            else if(file_exists(LIBS.'view'.DS.'helpers'.DS.Inflector::underscore($helper).'.php'))
+            {
+                $helperFn = LIBS.'view'.DS.'helpers'.DS.Inflector::underscore($helper).'.php';
+            }
+          
           $helperCn = ucfirst($helper).'Helper';
-
+          
           if (is_file($helperFn))
           {
              require_once $helperFn;

@@ -2,13 +2,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>CakePHP : a rapid development framework :: <?=$title_for_layout?></title>
+<link REL="SHORTCUT ICON" HREF="favicon.ico" type="image/x-icon">
 <?=$html->charsetTag('UTF-8')?>
-<?=$html->cssTag('default')?>
+<?=$html->cssTag('cake.default')?>
 </head>
 <body>
 <div id="main">
 	<div id="header">
-		<div id="headerLogo"><?= $html->image('logo.png'); ?></div>
+		<div id="headerLogo"><?= $html->image('cake.logo.png'); ?></div>
 		<div id="headerNav">
 			<? 
 				$css_class = ($title_for_layout == 'Home') ? 'active' : '';
@@ -28,19 +29,19 @@
 			?>
 		</div>
 		<div id="headerSubNav">
-			<? /*
+			<? 
 				$css_class = ($title_for_layout == 'Blog') ? 'active' : '';
-				echo $html->link('Blog', 'http://cakephp.org/blog/',array('class'=>$css_class));
+				echo $html->link('Blog', '/',array('class'=>$css_class));
 
 				$css_class = ($title_for_layout == 'Community') ? 'active' : '';
-				echo $html->link('Community', 'http://cakephp.org/community/',array('class'=>$css_class));
+				echo $html->link('Community', '/',array('class'=>$css_class));
 
-				$css_class = ($title_for_layout == 'Vendors') ? 'active' : '';
-				echo $html->link('3rd Party', 'http://cakephp.org/vendors/',array('class'=>$css_class));
+				$css_class = ($title_for_layout == 'Plugins') ? 'active' : '';
+				echo $html->link('Apps & Plugins', '/',array('class'=>$css_class));
 
-				$css_class = ($title_for_layout == 'Support') ? 'active' : '';
-				//echo $html->link('', 'http://cakephp.org/pages/support/',array('class'=>$css_class));
-				*/
+				$css_class = ($title_for_layout == 'Cakebin') ? 'active' : '';
+				echo $html->link('Cakebin', 'http://cakephp.org/pastes/',array('class'=>$css_class));
+				
 			?>
 		</div>
 	</div>
