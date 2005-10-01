@@ -475,6 +475,10 @@ class View extends Object
        {
            $viewFileName = LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS.$action.'.thtml';
        }
+       else
+       {
+           $viewFileName = VIEWS.$this->viewPath.DS.$action.'.thtml';
+       }
        
        $viewPath = explode(DS, $viewFileName);
        $i = array_search('..', $viewPath);

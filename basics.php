@@ -51,11 +51,18 @@ define('YEAR',  365 * DAY);
  */
 function loadModels () 
 {
-   require (CAKE.'app_model.php');
-   foreach (listClasses(MODELS) as $model_fn) 
-   {
-      require_once (MODELS.$model_fn);
-   }
+      if(file_exists(APP.'app_model.php'))
+      {
+          require_once(APP.'app_model.php');
+      }
+      else
+      {
+          require_once(CAKE.'app_model.php');
+      }
+      foreach (listClasses(MODELS) as $model_fn) 
+      {
+          require_once (MODELS.$model_fn);
+      }
 }
 
 /**
@@ -67,18 +74,20 @@ function loadModels ()
  * @uses CONTROLLERS
  */
 function loadControllers () 
-{
-   require (APP.'app_controller.php');
-
-   foreach (listClasses(HELPERS) as $helper) 
-   {
-      require_once (HELPERS.$helper.'.php');
-   }
-
-   foreach (listClasses(CONTROLLERS) as $controller) 
-   {
-      require_once (CONTROLLERS.$controller.'.php');
-   }
+{ 
+      if(file_exists(APP.'app_controller.php'))
+      {
+          require_once(APP.'app_controller.php');
+      }
+      else
+      {
+          require_once(CAKE.'app_controller.php');
+      }
+      
+      foreach (listClasses(CONTROLLERS) as $controller) 
+      {
+          require_once (CONTROLLERS.$controller.'.php');
+      }
 }
 
 /**
@@ -89,9 +98,6 @@ function loadControllers ()
   */
 function loadController ($name) 
 {
-   //$controller_fn = CONTROLLERS.Inflector::underscore($name).'_controller.php';
-   //$helper_fn = HELPERS.Inflector::underscore($name).'_helper.php';
-
       if(file_exists(CONTROLLERS.Inflector::underscore($name).'_controller.php'))
       {
           $controller_fn = CONTROLLERS.Inflector::underscore($name).'_controller.php';
@@ -100,13 +106,21 @@ function loadController ($name)
       {
           $controller_fn = LIBS.'controller'.DS.Inflector::underscore($name).'_controller.php';
       }
-   
-   require_once(CAKE.'app_controller.php');
-
-   //if (file_exists($helper_fn))
-   //   require_once($helper_fn);
-
-   return file_exists($controller_fn)? require_once($controller_fn): false;
+      else
+      {
+          $controller_fn = false;
+      }
+      
+      if(file_exists(APP.'app_controller.php'))
+      {
+          require_once(APP.'app_controller.php');
+      }
+      else
+      {
+          require_once(CAKE.'app_controller.php');
+      }
+      
+      return file_exists($controller_fn)? require_once($controller_fn): false;
 }
 
 /**
