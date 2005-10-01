@@ -244,11 +244,11 @@ class Dispatcher extends Object
 
       // if document root ends with 'public', it's probably correctly set
       $r = null;
-      if (ereg('/^.*/public(\/)?$/', $docRoot))
+      if (ereg('/^.*/app\/webroot(\/)?$/', $docRoot))
       return preg_match('/^(.*)\/index\.php$/', $scriptName, $r)? $r[1]: false;
       else
       // document root is probably not set to Cake 'public' dir
-      return preg_match('/^(.*)\/public\/index\.php$/', $scriptName, $r)? $r[1]: false;
+      return preg_match('/^(.*)\/app\/webroot\/index\.php$/', $scriptName, $r)? $r[1]: false;
    }
 
    
