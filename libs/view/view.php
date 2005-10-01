@@ -459,7 +459,16 @@ class View extends Object
    function _getViewFileName($action)
    {
       $action = Inflector::underscore($action);
-      $viewFileName = VIEWS.$this->viewPath.DS."{$action}.thtml";
+      
+      if(file_exists(VIEWS.$this->viewPath.DS."{$action}.thtml"))
+      {
+          $viewFileName = VIEWS.$this->viewPath.DS."{$action}.thtml";
+      }
+      elseif(file_exists(LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS."{$action}.thtml"))
+      {
+          $viewFileName = LIBS.'view'.DS.'templates'.DS.$this->viewPath.DS."{$action}.thtml";
+      }
+      
       $viewPath = explode(DS, $viewFileName);
 
       $i = array_search('..', $viewPath);
