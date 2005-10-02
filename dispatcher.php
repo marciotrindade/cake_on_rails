@@ -248,7 +248,7 @@ class Dispatcher extends Object
 
       // if document root ends with 'webroot', it's probably correctly set
       $r = null;
-      if (preg_match('/\\/app\/webroot(\/)?$/i', $docRoot))
+      if (preg_match('/\\/'.APP_DIR.'\/'.WEBROOT_DIR.'(\/)?$/i', $docRoot))
       {
           $this->webroot = DS;
           //return preg_match('/\\/index.php(\/)?$/i', $scriptName, $r)? $base.$r[1]: $base;
@@ -292,7 +292,7 @@ class Dispatcher extends Object
           {
               $webroot =setUri();
           } 
-          $this->webroot = preg_replace('/(?:app(.*)|index\\.php(.*))/i', '', $webroot).'app'.DS.'webroot'.DS;
+          $this->webroot = preg_replace('/(?:app(.*)|index\\.php(.*))/i', '', $webroot).APP_DIR.DS.WEBROOT_DIR.DS;
           // document root is probably not set to Cake 'webroot' dir
           //return preg_match('/\\/index.php(\/)?$/i', $scriptName, $r)? $base.$r[1]: $base;
           if (preg_match('/\\/index.php(\/)?$/i', $scriptName, $r))
