@@ -102,15 +102,17 @@ class Dispatcher extends Object
 
       if ($missingController)
       {
-         $ctrlClass        = 'AppController';
-         $controller       = new $ctrlClass($this);
+         //$ctrlClass        = 'AppController';
+         $controller       =& new AppController();
          $params['action'] = 'missingController';
          $params['controller'] = Inflector::camelize($params['controller']."Controller");
          $controller->missingController = $params['controller'];
+         call_user_func_array(array(&$controller, $params['action']), empty($params['pass'])? null: $params['pass']);
+         exit;
       }
       else
       {
-         $controller = new $ctrlClass($this);
+         $controller =& new $ctrlClass($this);
       }
       
       $classMethods = get_class_methods($controller);
