@@ -278,11 +278,7 @@ class Dispatcher extends Object
               {
                   if(!empty($dirName) && is_dir($docRoot.$first.DS.$dirName))
                   {
-                      $webPath[] = $dirName;
-                  }
-                  else
-                  {
-                      break;
+                      $webPath[] = $dirName.DS;
                   }
               }
               $webroot = implode('', $webPath);
@@ -292,9 +288,8 @@ class Dispatcher extends Object
           {
               $webroot =setUri();
           } 
-          $this->webroot = preg_replace('/(?:app(.*)|index\\.php(.*))/i', '', $webroot).APP_DIR.DS.WEBROOT_DIR.DS;
+          $this->webroot = preg_replace('/(?:'.APP_DIR.'(.*)|index\\.php(.*))/i', '', $webroot).APP_DIR.DS.WEBROOT_DIR.DS;
           // document root is probably not set to Cake 'webroot' dir
-          //return preg_match('/\\/index.php(\/)?$/i', $scriptName, $r)? $base.$r[1]: $base;
           if (preg_match('/\\/index.php(\/)?$/i', $scriptName, $r))
           {
               if(!empty($r[1]))
