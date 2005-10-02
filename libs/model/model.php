@@ -1663,7 +1663,7 @@ class Model extends Object
  */
 	function _throwMissingTable($tableName)
 	{
-	    $error = new AppController();
+	    $error =& new AppController();
         $error->missingTable = get_class($this);
         call_user_func_array(array(&$error, 'missingTable'), $tableName);
         exit;
@@ -1675,7 +1675,7 @@ class Model extends Object
  */
 	function _throwMissingConnection()
 	{
-	    $error = new AppController();
+	    $error =& new AppController();
         $error->missingConnection = get_class($this);
         call_user_func_array(array(&$error, 'missingConnection'), null);
         exit;
