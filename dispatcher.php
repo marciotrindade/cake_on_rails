@@ -106,6 +106,7 @@ class Dispatcher extends Object
          $params['action'] = 'missingController';
          $params['controller'] = Inflector::camelize($params['controller']."Controller");
          $controller->missingController = $params['controller'];
+         $controller->webroot     = $this->webroot;
          return $this->_invoke($controller, $params );
       }
       else
