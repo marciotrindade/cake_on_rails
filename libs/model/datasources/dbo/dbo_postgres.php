@@ -159,7 +159,7 @@ class DboPostgres extends DboSource {
 
 		$schema = $this->config['schema'];
 		$sql = "SELECT table_name as name FROM INFORMATION_SCHEMA.tables WHERE table_schema = '{$schema}';";
-		$result = $this->fetchAll($sql);
+		$result = $this->fetchAll($sql, false);
 
 		if (!$result) {
 			return array();
@@ -187,7 +187,7 @@ class DboPostgres extends DboSource {
 		$this->_sequenceMap[$table] = array();
 
 		if ($fields === null) {
-			$cols = $this->fetchAll("SELECT DISTINCT column_name AS name, data_type AS type, is_nullable AS null, column_default AS default, ordinal_position AS position, character_maximum_length AS char_length, character_octet_length AS oct_length FROM information_schema.columns WHERE table_name =" . $this->value($table) . " ORDER BY position");
+			$cols = $this->fetchAll("SELECT DISTINCT column_name AS name, data_type AS type, is_nullable AS null, column_default AS default, ordinal_position AS position, character_maximum_length AS char_length, character_octet_length AS oct_length FROM information_schema.columns WHERE table_name =" . $this->value($table) . " ORDER BY position", false);
 
 			foreach ($cols as $column) {
 				$colKey = array_keys($column);
@@ -251,6 +251,9 @@ class DboPostgres extends DboSource {
 		if ($data === null) {
 			return 'NULL';
 		}
+		if (empty($column)) {
+			$column = $this->introspectType($data);
+		}
 
 		switch($column) {
 			case 'inet':
@@ -258,20 +261,19 @@ class DboPostgres extends DboSource {
 			case 'integer':
 				if ($data === '') {
 					return 'DEFAULT';
-				} else {
-					$data = pg_escape_string($data);
 				}
-			break;
 			case 'binary':
 				$data = pg_escape_bytea($data);
 			break;
 			case 'boolean':
-			default:
 				if ($data === true) {
 					return 'TRUE';
 				} elseif ($data === false) {
 					return 'FALSE';
 				}
+				return 'DEFAULT';
+			break;
+			default:
 				$data = pg_escape_string($data);
 			break;
 		}
@@ -599,8 +601,8 @@ class DboPostgres extends DboSource {
  * @return string
  */
 	function buildColumn($column) {
-		$out = str_replace('integer serial', 'serial', parent::buildColumn($column));
-		return preg_replace('/integer\([0-9]+\)/', 'integer', $out);
+		$out = preg_replace('/integer\([0-9]+\)/', 'integer', parent::buildColumn($column));
+		return str_replace('integer serial', 'serial', $out);
 	}
 /**
  * Format indexes for create table

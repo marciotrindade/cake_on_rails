@@ -856,7 +856,7 @@ class Model extends Overloadable {
 	function getColumnTypes() {
 		$columns = $this->schema();
 		if (empty($columns)) {
-		    trigger_error(__('(Model::getColumnTypes) Unable to build model field data. If you are using a model without a database table, try implementing schema()', true), E_USER_WARNING);
+			trigger_error(__('(Model::getColumnTypes) Unable to build model field data. If you are using a model without a database table, try implementing schema()', true), E_USER_WARNING);
 		}
 		$cols = array();
 		foreach ($columns as $field => $values) {
@@ -872,17 +872,30 @@ class Model extends Overloadable {
  * @access public
  */
 	function getColumnType($column) {
+		$db =& ConnectionManager::getDataSource($this->useDbConfig);
 		$cols = $this->schema();
+		$model = null;
+
+		$column = str_replace(array($db->startQuote, $db->endQuote), '', $column);
+
+		if (strpos($column, '.')) {
+			list($model, $column) = explode('.', $column);
+		}
+		if ($model != $this->alias && isset($this->{$model})) {
+			return $this->{$model}->getColumnType($column);
+		}
 		if (isset($cols[$column]) && isset($cols[$column]['type'])) {
 			return $cols[$column]['type'];
 		}
-		return 'string';
+		return null;
 	}
 /**
  * Returns true if this Model has given field in its database table.
  *
- * @param string $name Name of field to look for
- * @return bool Success
+ * @param mixed $name Name of field to look for, or an array of names
+ * @return mixed If $name is a string, returns a boolean indicating whether the field exists.
+ *               If $name is an array of field names, returns the first field that exists,
+ *               or false if none exist.
  * @access public
  */
 	function hasField($name) {
@@ -1396,9 +1409,9 @@ class Model extends Overloadable {
 							}
 							$_options = array_merge($options, array('atomic' => false));
 
-                            if ($_options['validate'] === 'first') {
-                                $_options['validate'] = 'only';
-                            }
+							if ($_options['validate'] === 'first') {
+								$_options['validate'] = 'only';
+							}
 							$_return = $this->{$association}->saveAll($values, $_options);
 
 							if ($_return === false || (is_array($_return) && in_array(false, $_return, true))) {
@@ -1406,14 +1419,14 @@ class Model extends Overloadable {
 								$validates = false;
 							}
 							if (is_array($_return)) {
-    							foreach ($_return as $val) {
-    							    if (!isset($return[$association])) {
-    							        $return[$association] = array();
-    							    } elseif (!is_array($return[$association])) {
-    							        $return[$association] = array($return[$association]);
-    							    }
-    								$return[$association][] = $val;
-    							}
+								foreach ($_return as $val) {
+									if (!isset($return[$association])) {
+										$return[$association] = array();
+									} elseif (!is_array($return[$association])) {
+										$return[$association] = array($return[$association]);
+									}
+									$return[$association][] = $val;
+								}
 							} else {
 							    $return[$association] = $_return;
 							}
@@ -1702,7 +1715,8 @@ class Model extends Overloadable {
  * 					'conditions' => array('name' => 'Thomas Anderson'),
  * 					'fields' => array('name', 'email'),
  * 					'order' => 'field3 DESC',
- * 					'recursive' => 2));
+ * 					'recursive' => 2,
+ * 					'group' => 'type'));
  *
  * Specifying 'fields' for new-notation 'list':
  *  - If no fields are specified, then 'id' is used for key and 'model->displayField' is used for value.
@@ -1732,7 +1746,7 @@ class Model extends Overloadable {
 		$query = array_merge(
 			array(
 				'conditions' => null, 'fields' => null, 'joins' => array(),
-				'limit' => null, 'offset' => null, 'order' => null, 'page' => null
+				'limit' => null, 'offset' => null, 'order' => null, 'page' => null, 'group' => null
 			),
 			$query
 		);
@@ -2120,7 +2134,7 @@ class Model extends Overloadable {
 		if (isset($data[$this->alias])) {
 			$data = $data[$this->alias];
 		} elseif (!is_array($data)) {
-		    $data = array();
+			$data = array();
 		}
 
 		$Validation =& Validation::getInstance();

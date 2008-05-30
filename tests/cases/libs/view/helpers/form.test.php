@@ -142,6 +142,7 @@ class ValidateUser extends CakeTestModel {
 			'id' => array('type' => 'integer', 'null' => '', 'default' => '', 'length' => '8'),
 			'name' => array('type' => 'string', 'null' => '', 'default' => '', 'length' => '255'),
 			'email' => array('type' => 'string', 'null' => '', 'default' => '', 'length' => '255'),
+			'balance' => array('type' => 'float', 'null' => false, 'length' => '5,2'),
 			'created' => array('type' => 'date', 'null' => '1', 'default' => '', 'length' => ''),
 			'updated' => array('type' => 'datetime', 'null' => '1', 'default' => '', 'length' => null)
 		);
@@ -604,7 +605,7 @@ class FormHelperTest extends CakeTestCase {
 			'label' => array('for'),
 			'preg:/[^<]+/',
 			'/label',
-			'input' => array('type' => 'text', 'name', 'value' => '', 'id', 'class' => 'form-error'),
+			'input' => array('type' => 'text', 'name', 'value' => '', 'id', 'class' => 'form-error', 'maxlength' => 255),
 			array('div' => array('class' => 'error-message')),
 			'This field cannot be left blank',
 			'/div',
@@ -689,13 +690,24 @@ class FormHelperTest extends CakeTestCase {
 	}
 
 	function testFormInput() {
+		$result = $this->Form->input('ValidateUser.balance');
+		$expected = array(
+			'div' => array('class'),
+			'label' => array('for'),
+			'Balance',
+			'/label',
+			'input' => array('name', 'type' => 'text', 'maxlength' => 8, 'value' => '', 'id'),
+			'/div',
+		);
+		$this->assertTags($result, $expected);
+
 		$result = $this->Form->input('Contact.email', array('id' => 'custom'));
 		$expected = array(
 			'div' => array('class' => 'input text'),
 			'label' => array('for' => 'custom'),
 			'Email',
 			'/label',
-			array('input' => array('type' => 'text', 'name' => 'data[Contact][email]', 'value' => '', 'id' => 'custom')),
+			array('input' => array('type' => 'text', 'name' => 'data[Contact][email]', 'value' => '', 'id' => 'custom', 'maxlength' => 255)),
 			'/div'
 		);
 		$this->assertTags($result, $expected);
@@ -801,7 +813,7 @@ class FormHelperTest extends CakeTestCase {
 			'label' => array('for' => 'ContactPhone'),
 			'Phone',
 			'/label',
-			array('input' => array('type' => 'text', 'name' => 'data[Contact][phone]', 'value' => 'Hello &amp; World &gt; weird chars', 'id' => 'ContactPhone')),
+			array('input' => array('type' => 'text', 'name' => 'data[Contact][phone]', 'value' => 'Hello &amp; World &gt; weird chars', 'id' => 'ContactPhone', 'maxlength' => 255)),
 			'/div'
 		);
 		$this->assertTags($result, $expected);
@@ -2245,8 +2257,41 @@ class FormHelperTest extends CakeTestCase {
 			'/div'
 		);
 		$this->assertTags($result, $expected);
-	}
+		
+		$this->Form->create('Contact');
+		$result = $this->Form->input('published', array('monthNames' => false));
+		$now = strtotime('now');
+		$expected = array(
+			'div' => array('class' => 'input date'),
+			'label' => array('for' => 'ContactPublishedMonth'),
+			'Published',
+			'/label',
+			array('select' => array('name' => 'data[Contact][published][month]', 'id' => 'ContactPublishedMonth')),
+			'preg:/(?:<option value="([\d])+">[\d]+<\/option>[\r\n]*)*/',
+			array('option' => array('value' => date('m', $now), 'selected' => 'selected')),
+			date('m', $now),
+			'/option',
+			'*/select',
+			'-',
+			array('select' => array('name' => 'data[Contact][published][day]', 'id' => 'ContactPublishedDay')),
+			$daysRegex,
+			array('option' => array('value' => date('d', $now), 'selected' => 'selected')),
+			date('j', $now),
+			'/option',
+			'*/select',
+			'-',
+			array('select' => array('name' => 'data[Contact][published][year]', 'id' => 'ContactPublishedYear')),
+			$yearsRegex,
+			array('option' => array('value' => date('Y', $now), 'selected' => 'selected')),
+			date('Y', $now),
+			'/option',
+			'*/select',
+			'/div'
+		);
+		$this->assertTags($result, $expected);
 
+	}
+	
 	function testFormDateTimeMulti() {
 		extract(Configure::read('FormHelperTest.regex'));
 
@@ -2340,6 +2385,21 @@ class FormHelperTest extends CakeTestCase {
 			'/option',
 			array('option' => array('value' => '02')),
 			date('F', strtotime('2008-02-01 00:00:00')),
+			'/option',
+			'*/select',
+		);
+		$this->assertTags($result, $expected);
+		
+		$result = $this->Form->month('Model.field', null, array('monthNames' => false), true);
+		$expected = array(
+			array('select' => array('name' => 'data[Model][field][month]', 'id' => 'ModelFieldMonth')),
+			array('option' => array('value' => '')),
+			'/option',
+			array('option' => array('value' => '01')),
+			date('m', strtotime('2008-01-01 00:00:00')),
+			'/option',
+			array('option' => array('value' => '02')),
+			date('m', strtotime('2008-02-01 00:00:00')),
 			'/option',
 			'*/select',
 		);

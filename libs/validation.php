@@ -610,18 +610,19 @@ class Validation extends Object {
  * @return boolean Success
  * @access public
  */
-    function money($check, $symbolPosition = 'left') {
-    	$_this =& Validation::getInstance();
-    	$_this->check = $check;
-    	switch ($symbolPosition) {
-    		case 'left':
-    			$_this->regex = '/^(?!\x{00a2})\p{Sc}?(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?(?:\1\d{3})*|(?:\d+))((?!\1)[,.]\d{2})?$/u';
-    		break;
-    		case 'right':
-    			$_this->regex = '/^(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?(?:\1\d{3})*|(?:\d+))((?!\1)[,.]\d{2})?(?<!\x{00a2})\p{Sc}?$/u';
-    		break;
-    	}
-    	return $_this->_check();
+	function money($check, $symbolPosition = 'left') {
+		$_this =& Validation::getInstance();
+		$_this->check = $check;
+
+		switch ($symbolPosition) {
+			case 'left':
+				$_this->regex = '/^(?!\x{00a2})\p{Sc}?(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?(?:\1\d{3})*|(?:\d+))((?!\1)[,.]\d{2})?$/u';
+			break;
+			case 'right':
+				$_this->regex = '/^(?!0,?\d)(?:\d{1,3}(?:([, .])\d{3})?(?:\1\d{3})*|(?:\d+))((?!\1)[,.]\d{2})?(?<!\x{00a2})\p{Sc}?$/u';
+			break;
+		}
+		return $_this->_check();
     }
 /**
  * Validate a multiple select.
@@ -632,7 +633,7 @@ class Validation extends Object {
  * @access public
  * @todo Implement
  */
-    function multiple($check, $type, $regex = null) {
+	function multiple($check, $type, $regex = null) {
     	//Validate a select object for a selected index past 0.
     	//Validate a select against a list of restriced indexes.
     	//Validate a multiple-select for the quantity selected.
@@ -671,7 +672,7 @@ class Validation extends Object {
 				case 'us':
 				default:
 					$_this->regex  = '/^1?[-. ]?\\(?([0-9]{3})\\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/';
-					break;
+				break;
 			}
 		}
 		return $_this->_check();
@@ -790,7 +791,7 @@ class Validation extends Object {
 		$_this =& Validation::getInstance();
 		$_this->check = $check;
 		$_this->regex = '/^(?:(?:https?|ftps?|file|news|gopher):\\/\\/)?(?:(?:(?:25[0-5]|2[0-4]\d|(?:(?:1\d)?|[1-9]?)\d)\.){3}(?:25[0-5]|2[0-4]\d|(?:(?:1\d)?|[1-9]?)\d)'
-							. '|(?:[0-9a-z]{1}[0-9a-z\\-]*\\.)*(?:[0-9a-z]{1}[0-9a-z\\-]{0,56})\\.(?:[a-z]{2,6}|[a-z]{2}\\.[a-z]{2,6})'
+							. '|(?:[0-9a-z]{1}[0-9a-z\\-]*\\.)*(?:[0-9a-z]{1}[0-9a-z\\-]{0,62})\\.(?:[a-z]{2,6}|[a-z]{2}\\.[a-z]{2,6})'
 							. '(?::[0-9]{1,4})?)(?:\\/?|\\/[\\w\\-\\.,\'@?^=%&:;\/~\\+#]*[\\w\\-\\@?^=%&\/~\\+#])$/i';
         return $_this->_check();
 	}

@@ -169,9 +169,9 @@ class TranslateBehavior extends ModelBehavior {
 					);
 
 					if (is_string($query['conditions'])) {
-						$query['conditions'] = $db->conditions($query['conditions'], true, false) . ' AND '.$db->name('I18n__'.$field.'.locale').' = \''.$locale.'\'';
+						$query['conditions'] = $db->conditions($query['conditions'], true, false, $model) . ' AND '.$db->name('I18n__'.$field.'.locale').' = \''.$locale.'\'';
 					} else {
-						$query['conditions'][$db->name('I18n__'.$field.'.locale')] = $locale;
+						$query['conditions'][$db->name("I18n__{$field}.locale")] = $locale;
 					}
 				}
 			}
@@ -217,7 +217,7 @@ class TranslateBehavior extends ModelBehavior {
 			}
 		}
 		return $results;
-    }
+	}
 /**
  * Callback
  */

@@ -37,6 +37,7 @@ require_once dirname(__FILE__) . DS . 'models.php';
  * @subpackage	cake.tests.cases.libs.model
  */
 class ModelTest extends CakeTestCase {
+
 	var $autoFixtures = false;
 
 	var $fixtures = array(
@@ -48,7 +49,7 @@ class ModelTest extends CakeTestCase {
 		'core.document', 'core.device', 'core.document_directory', 'core.primary_model', 'core.secondary_model', 'core.something',
 		'core.something_else', 'core.join_thing', 'core.join_a', 'core.join_b', 'core.join_c', 'core.join_a_b', 'core.join_a_c',
 		'core.uuid', 'core.data_test', 'core.posts_tag', 'core.the_paper_monkies', 'core.person', 'core.underscore_field',
-		'core.node', 'core.dependency'
+		'core.node', 'core.dependency', 'core.product'
 	);
 
 	function start() {
@@ -75,6 +76,19 @@ class ModelTest extends CakeTestCase {
 			'deleteQuery' => '', 'insertQuery' => ''
 		));
 		$this->assertEqual($result, $expected);
+	}
+
+	function testColumnTypeFetching() {
+		$model =& new Test();
+		$this->assertEqual($model->getColumnType('id'), 'integer');
+		$this->assertEqual($model->getColumnType('notes'), 'text');
+		$this->assertEqual($model->getColumnType('updated'), 'datetime');
+		$this->assertEqual($model->getColumnType('unknown'), null);
+
+		$model =& new Article();
+		$this->assertEqual($model->getColumnType('User.created'), 'datetime');
+		$this->assertEqual($model->getColumnType('Tag.id'), 'integer');
+		$this->assertEqual($model->getColumnType('Article.id'), 'integer');
 	}
 
 	function testMultipleBelongsToWithSameClass() {
@@ -153,7 +167,8 @@ class ModelTest extends CakeTestCase {
 					)
 				)),
 				'conditions' => array(),
-				'order' => null
+				'order' => null,
+				'group' => null
 			),
 			$Article
 		);
@@ -332,14 +347,14 @@ class ModelTest extends CakeTestCase {
 
 		$this->assertEqual($result, $expected);
 
+		$ts = date('Y-m-d H:i:s');
 		$TestModel->id = 1;
 		$data = array(
-			'JoinA' => array('id' => '1', 'name' => 'New name for Join A 1'),
-			'JoinB' => array(array('id' => 1, 'join_b_id' => 2, 'other' => 'New data for Join A 1 Join B 2')),
-			'JoinC' => array(array('id' => 1, 'join_c_id' => 2, 'other' => 'New data for Join A 1 Join C 2')));
+			'JoinA' => array('id' => '1', 'name' => 'New name for Join A 1', 'updated' => $ts),
+			'JoinB' => array(array('id' => 1, 'join_b_id' => 2, 'other' => 'New data for Join A 1 Join B 2', 'created' => $ts, 'updated' => $ts)),
+			'JoinC' => array(array('id' => 1, 'join_c_id' => 2, 'other' => 'New data for Join A 1 Join C 2', 'created' => $ts, 'updated' => $ts)));
 		$TestModel->set($data);
 		$TestModel->save();
-		$ts = date('Y-m-d H:i:s');
 
 		$result = $TestModel->findById(1);
 		$expected = array(
@@ -411,8 +426,64 @@ class ModelTest extends CakeTestCase {
 						'Mother' => array(),
 						'Father' => array())));
 		$this->assertEqual($result, $expected);
-	}
+	}	
+	
+	function testGroupByFind() {
+		$this->loadFixtures('Product');
+		$Product =& new Product();
 
+        $result = $Product->find('all',array('fields'=>array('Product.type','MIN(Product.price) as price'), 'group'=> 'Product.type'));
+
+        $expected = array(
+            0 => array(
+                'Product' => array(
+						'type' => 'Clothing',
+						'price' => 32)
+            ),
+            1 => array(
+                'Product' => array(
+					'type' => 'Food',
+               		'price' => 9)
+            ),
+            2 => array(
+                'Product' => array(
+					'type' => 'Music',
+                	'price' => 4)
+            ),
+            3 => array(
+                'Product' => array(
+					'type' => 'Toy',
+                	'price' => 3)
+            ),
+        );
+
+        $this->assertEqual($result, $expected);
+    }
+
+	function testGroupByFindAssociations() {
+		$this->loadFixtures('Project', 'Thread', 'Message', 'Bid');
+		$Thread =& new Thread();	
+		$result = $Thread->find('all', array('conditions' => array('Thread.project_id' => 1 ), 'group' => 'Thread.project_id'));
+		$expected = array(
+			array(
+			'Thread' => array(
+				'id' => '1',
+				'project_id' => 1, 
+				'name' => 'Project 1, Thread 1',
+			), 
+			'Message' => array(
+				array(	'id' => 1,
+						'thread_id' => 1,
+						'name' => 'Thread 1, Message 1'
+					)
+
+				)
+			),
+		);
+		$this->assertEqual($result, $expected);		
+
+	}
+	
 	function testIdentity() {
 		$TestModel =& new Test();
 		$result = $TestModel->alias;
@@ -1585,7 +1656,13 @@ class ModelTest extends CakeTestCase {
 		$this->assertTrue($result);
 
 		$TestModel->validate = array('title' => array('allowEmpty' => true, 'rule' => 'validateTitle'));
+		$data = array('TestValidate' => array('title' => ''));
+		$result = $TestModel->create($data);
+		$this->assertTrue($result);
+		$result = $TestModel->validates();
+		$this->assertTrue($result);
 
+		$TestModel->validate = array('title' => array('length' => array('allowEmpty' => true, 'rule' => array('maxLength', 10))));
 		$data = array('TestValidate' => array('title' => ''));
 		$result = $TestModel->create($data);
 		$this->assertTrue($result);
@@ -1593,7 +1670,6 @@ class ModelTest extends CakeTestCase {
 		$this->assertTrue($result);
 
 		$TestModel->validate = array('title' => array('rule' => array('userDefined', 'Article', 'titleDuplicate')));
-
 		$data = array('TestValidate' => array('title' => 'My Article Title'));
 		$result = $TestModel->create($data);
 		$this->assertTrue($result);
@@ -3848,7 +3924,10 @@ class ModelTest extends CakeTestCase {
 		$this->assertTrue(is_object($TestModel->Behaviors->Tree));
 		$this->assertEqual($TestModel->Behaviors->attached(), array('Tree'));
 
-		$expected = array('parent' => 'parent_id', 'left' => 'left_field', 'right' => 'right_field', 'scope' => '1 = 1', 'type' => 'nested', '__parentChange' => false);
+		$expected = array(
+			'parent' => 'parent_id', 'left' => 'left_field', 'right' => 'right_field', 'scope' => '1 = 1',
+			'type' => 'nested', '__parentChange' => false, 'recursive' => -1
+		);
 		$this->assertEqual($TestModel->Behaviors->Tree->settings['Apple'], $expected);
 
 		$expected['enabled'] = false;

@@ -378,7 +378,7 @@ class EmailComponent extends Object{
 			$msg .= 'Content-Type: text/plain; charset=' . $this->charset . $this->_newLine;
 			$msg .= 'Content-Transfer-Encoding: 7bit' . $this->_newLine . $this->_newLine;
 
-			$content = $View->renderElement('email' . DS . 'text' . DS . $this->template, array('content' => $content), true);
+			$content = $View->element('email' . DS . 'text' . DS . $this->template, array('content' => $content), true);
 			$View->layoutPath = 'email' . DS . 'text';
 			$msg .= $View->renderLayout($content) . $this->_newLine;
 
@@ -386,7 +386,7 @@ class EmailComponent extends Object{
 			$msg .= 'Content-Type: text/html; charset=' . $this->charset . $this->_newLine;
 			$msg .= 'Content-Transfer-Encoding: 7bit' . $this->_newLine . $this->_newLine;
 
-			$content = $View->renderElement('email' . DS . 'html' . DS . $this->template, array('content' => $htmlContent), true);
+			$content = $View->element('email' . DS . 'html' . DS . $this->template, array('content' => $htmlContent), true);
 			$View->layoutPath = 'email' . DS . 'html';
 			$msg .= $View->renderLayout($content) . $this->_newLine . $this->_newLine;
 			$msg .= '--alt-' . $this->__boundary . '--' . $this->_newLine . $this->_newLine;
@@ -406,7 +406,7 @@ class EmailComponent extends Object{
 			}
 		}
 
-		$content = $View->renderElement('email' . DS . $this->sendAs . DS . $this->template, array('content' => $content), true);
+		$content = $View->element('email' . DS . $this->sendAs . DS . $this->template, array('content' => $content), true);
 		$View->layoutPath = 'email' . DS . $this->sendAs;
 		$msg .= $View->renderLayout($content) . $this->_newLine;
 		return $msg;
@@ -426,6 +426,7 @@ class EmailComponent extends Object{
  * @access private
  */
 	function __createHeader() {
+		$this->__header = '';
 		if ($this->delivery == 'smtp') {
 			$this->__header = 'To: ' . $this->__formatAddress($this->to) . $this->_newLine;
 		}
@@ -491,6 +492,7 @@ class EmailComponent extends Object{
  * @access private
  */
 	function __formatMessage($message) {
+		$this->__message = '';
 		if (!empty($this->attachments)) {
 			$this->__message .= '--' . $this->__boundary . $this->_newLine;
 			$this->__message .= 'Content-Type: text/plain; charset=' . $this->charset . $this->_newLine;
@@ -620,12 +622,20 @@ class EmailComponent extends Object{
  * @access private
  */
 	function __strip($value, $message = false) {
-		$search = array('/%0a/i', '/%0d/i', '/Content-Type\:/i',
-							'/charset\=/i', '/mime-version\:/i', '/multipart\/mixed/i',
-							'/bcc\:.*/i','/to\:.*/i','/cc\:.*/i', '/\\r/i', '/\\n/i');
+		$search = array(
+			'/%0a/i', '/%0d/i', '/Content-Type\:/i', '/charset\=/i', '/mime-version\:/i',
+			'/multipart\/mixed/i', '/bcc\:.*/i','/to\:.*/i','/cc\:.*/i', '/Content-Transfer-Encoding\:/i',
+			'/\\r/i', '/\\n/i'
+		);
 
 		if ($message === true) {
 			$search = array_slice($search, 0, -2);
+		}
+
+		foreach ($search as $key) {
+			while (preg_match($key, $value)) {
+				$value = preg_replace($key, '', $value);
+			}
 		}
 		return preg_replace($search, '', $value);
 	}
@@ -648,145 +658,91 @@ class EmailComponent extends Object{
  * @access private
  */
 	function __smtp() {
-		$response = $this->__smtpConnect();
-
-		if ($response['errno'] != 0 && $response['status'] === false) {
-			$this->smtpError = "{$response['errno']}: {$response['errstr']}";
+		App::import('Core', array('Socket'));
+		
+		$this->__smtpConnection =& new CakeSocket(array_merge(array('protocol'=>'smtp'), $this->smtpOptions));
+		
+		if (!$this->__smtpConnection->connect()) {
+			$this->smtpError = $this->__smtpConnection->lastError();
+			return false;
+		} elseif (!$this->__smtpSend(null, '220')) {
+			return false;
+		}
+		
+		if (!$this->__smtpSend('HELO cake', '250')) {
 			return false;
 		}
 
-		if (!$this->__sendData("HELO cake\r\n")) {
+		if (isset($this->smtpOptions['username']) && isset($this->smtpOptions['password'])) {
+			if (!$this->__smtpSend('AUTH LOGIN', '334')) {
+				return false;
+			}
+			if (!$this->__smtpSend(base64_encode($this->smtpOptions['username']), '334')) {
+				return false;
+			}
+			if (!$this->__smtpSend(base64_encode($this->smtpOptions['password']), '235')) {
+				return false;
+			}
+		}
+
+		if (!$this->__smtpSend('MAIL FROM: ' . $this->__formatAddress($this->from, true))) {
 			return false;
 		}
 
-		if (isset($this->smtpOptions['username']) && isset($this->smtpOptions['password']) && !$this->__authenticate()){
-			return false;
-		}
-
-		if (!$this->__sendData("MAIL FROM: " . $this->__formatAddress($this->from, true) . "\r\n")) {
-			return false;
-		}
-
-		if (!$this->__sendData("RCPT TO: " . $this->__formatAddress($this->to, true) . "\r\n")) {
+		if (!$this->__smtpSend('RCPT TO: ' . $this->__formatAddress($this->to, true))) {
 			return false;
 		}
 
 		foreach ($this->cc as $cc) {
-			if (!$this->__sendData("RCPT TO: " . $this->__formatAddress($cc, true) . "\r\n")) {
+			if (!$this->__smtpSend('RCPT TO: ' . $this->__formatAddress($cc, true))) {
 				return false;
 			}
 		}
 		foreach ($this->bcc as $bcc) {
-			if (!$this->__sendData("RCPT TO: " . $this->__formatAddress($bcc, true) . "\r\n")) {
+			if (!$this->__smtpSend('RCPT TO: ' . $this->__formatAddress($bcc, true))) {
 				return false;
 			}
 		}
-		$this->__sendData("DATA\r\n", false);
-		$response = $this->__getSmtpResponse();
 
-		if (stristr($response, '354') === false){
-			$this->smtpError = $response;
+		if (!$this->__smtpSend('DATA', '354')) {
 			return false;
 		}
 
-		if (!$this->__sendData($this->__header . "\r\n\r\n" . $this->__message . "\r\n\r\n\r\n.\r\n")) {
+		if (!$this->__smtpSend($this->__header . "\r\n\r\n" . $this->__message . "\r\n\r\n\r\n.")) {
 			return false;
 		}
-		$this->__sendData("QUIT\r\n", false);
+		$this->__smtpSend('QUIT', false);
+		
+		$this->__smtpConnection->disconnect();
 		return true;
-	}
-/**
- * Connect to an SMTP server
- *
- * @param array $options SMTP connection options
- * @return array Indexed array with status information: 'status', 'errno', 'errstr'
- * @access private
- */
-	function __smtpConnect() {
-		$status = true;
-		$this->__smtpConnection = @fsockopen($this->smtpOptions['host'],
-											$this->smtpOptions['port'],
-											$errno,
-											$errstr,
-											$this->smtpOptions['timeout']);
-
-		if ($this->__smtpConnection == false) {
-			$status = false;
-		}
-		$response = $this->__getSmtpResponse();
-
-		return array('status' => $status,
-					 'errno' => $errno,
-					 'errstr' => $errstr);
-	}
-/**
- * Get SMTP response
- *
- * @return string SMTP server response
- * @access private
- */
-	function __getSmtpResponse() {
-		$response = "";
-
-		while($str = @fgets($this->__smtpConnection, 512)) {
-			$response .= $str;
-
-			if(substr($str, 3, 1) == " ") {
-				break;
-			}
-		}
-		return $response;
 	}
 /**
  * Private method for sending data to SMTP connection
  *
  * @param string $data data to be sent to SMTP server
- * @param boolean $check check for response from server
+ * @param mixed $checkCode code to check for in server response, false to skip
  * @return bool Success
  * @access private
  */
-	function __sendData($data, $check = true) {
-		@fwrite($this->__smtpConnection, $data);
+	function __smtpSend($data, $checkCode = '250') {
+		if (!is_null($data)) {
+			$this->__smtpConnection->write($data . "\r\n");
+		}
+		if ($checkCode !== false) {
+			$response = '';
 
-		if ($check === true) {
-			$response = $this->__getSmtpResponse();
+			while ($str = $this->__smtpConnection->read()) {
+				$response .= $str;
 
-			if (stristr($response, '250') === false) {
+				if ($str[3] == ' ') {
+					break;
+				}
+			}
+			
+			if (stristr($response, $checkCode) === false) {
 				$this->smtpError = $response;
 				return false;
 			}
-		}
-		return true;
-	}
-/**
- * SMTP authentication
- *
- * @return bool Success
- * @access private
- */
-	function __authenticate(){
-		@fwrite($this->__smtpConnection, "AUTH LOGIN\r\n");
-		$response = $this->__getSmtpResponse();
-
-		if (stristr($response, '334') === false){
-			$this->smtpError = $response;
-			return false;
-		}
-
-		@fwrite($this->__smtpConnection, base64_encode($this->smtpOptions['username'])."\r\n");
-		$response = $this->__getSmtpResponse();
-
-		if (stristr($response, '334') === false){
-			$this->smtpError = $response;
-			return false;
-		}
-
-		@fwrite($this->__smtpConnection, base64_encode($this->smtpOptions['password'])."\r\n");
-		$response = $this->__getSmtpResponse();
-
-		if (stristr($response, '235') === false){
-			$this->smtpError = $response;
-			return false;
 		}
 		return true;
 	}
@@ -797,19 +753,20 @@ class EmailComponent extends Object{
  * @access private
  */
 	function __debug() {
+		$nl = $this->_newLine;
 		$fm = '<pre>';
 
 		if ($this->delivery == 'smtp') {
-			$fm .= sprintf("%s %s\n", 'Host:', $this->smtpOptions['host']);
-			$fm .= sprintf("%s %s\n", 'Port:', $this->smtpOptions['port']);
-			$fm .= sprintf("%s %s\n", 'Timeout:', $this->smtpOptions['timeout']);
+			$fm .= sprintf('%s %s%s', 'Host:', $this->smtpOptions['host'], $nl);
+			$fm .= sprintf('%s %s%s', 'Port:', $this->smtpOptions['port'], $nl);
+			$fm .= sprintf('%s %s%s', 'Timeout:', $this->smtpOptions['timeout'], $nl);
 		}
-		$fm .= sprintf("%s %s\n", 'To:', $this->to);
-		$fm .= sprintf("%s %s\n", 'From:', $this->from);
-		$fm .= sprintf("%s %s\n", 'Subject:', $this->subject);
-		$fm .= sprintf("%s\n\n%s", 'Header:', $this->__header);
-		$fm .= sprintf("%s\n\n%s", 'Parameters:', $this->additionalParams);
-		$fm .= sprintf("%s\n\n%s", 'Message:', $this->__message);
+		$fm .= sprintf('%s %s%s', 'To:', $this->to, $nl);
+		$fm .= sprintf('%s %s%s', 'From:', $this->from, $nl);
+		$fm .= sprintf('%s %s%s', 'Subject:', $this->subject, $nl);
+		$fm .= sprintf('%s%3$s%3$s%s', 'Header:', $this->__header, $nl);
+		$fm .= sprintf('%s%3$s%3$s%s', 'Parameters:', $this->additionalParams, $nl);
+		$fm .= sprintf('%s%3$s%3$s%s', 'Message:', $this->__message, $nl);
 		$fm .= '</pre>';
 
 		$this->Controller->Session->setFlash($fm, 'default', null, 'email');

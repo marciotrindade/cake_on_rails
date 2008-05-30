@@ -626,36 +626,39 @@ class Configure extends Object {
 				$_this->write('App.server', 'IIS');
 			}
 
-			if (!include(APP_PATH . 'config' . DS . 'core.php')) {
+			if (!include(CONFIGS . 'core.php')) {
 				trigger_error(sprintf(__("Can't find application core file. Please create %score.php, and make sure it is readable by PHP.", true), CONFIGS), E_USER_ERROR);
 			}
 
-			if (!include(APP_PATH . 'config' . DS . 'bootstrap.php')) {
+			if (!include(CONFIGS . 'bootstrap.php')) {
 				trigger_error(sprintf(__("Can't find application bootstrap file. Please create %sbootstrap.php, and make sure it is readable by PHP.", true), CONFIGS), E_USER_ERROR);
 			}
 
 			if ($_this->read('Cache.disable') !== true) {
 				$cache = Cache::config('default');
-				
+
 				if (empty($cache['settings'])) {
 					trigger_error('Cache not configured properly. Please check Cache::config(); in APP/config/core.php', E_USER_WARNING);
-					list($engine, $cache) = Cache::config('default', array('engine' => 'File'));
-				} else {
-					$cache = $cache['settings'];
+					$cache = Cache::config('default', array('engine' => 'File'));
 				}
-				
+
+				$coreCache = array_merge($cache['settings'], array('prefix' => 'cake_core_', 'serialize' => true));
+				$modelCache = array_merge($cache['settings'], array('prefix' => 'cake_model_', 'serialize' => true));
+
 				if (Configure::read() > 1) {
-					$cache['duration'] = 10;
+					$coreCache['duration'] = 10;
+					$modelCache['duration'] = 10;
 				}
-				$settings = array(
-					'prefix' => 'cake_core_',
-					'path' => realpath($cache['path'].DS.'persistent').DS,
-					'serialize' => true
-				);
- 				$config = Cache::config('_cake_core_' , array_merge($cache, $settings));
+
+				if (!empty($coreCache['path'])) {
+					$coreCache['path'] = realpath($coreCache['path'] . DS . 'persistent') . DS;
+					$modelCache['path'] = realpath($modelCache['path'] . DS . 'models') . DS;
+				}
+
+				Cache::config('_cake_core_' , $coreCache);
+				Cache::config('_cake_model_' , $modelCache);
 			}
-		}
-		if (empty($_this->modelPaths)) {
+
 			$_this->buildPaths(compact('modelPaths', 'viewPaths', 'controllerPaths', 'helperPaths', 'componentPaths', 'behaviorPaths', 'pluginPaths', 'vendorPaths'));
 		}
 	}

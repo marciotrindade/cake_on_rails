@@ -478,18 +478,30 @@ class HtmlHelper extends AppHelper {
  * @param array $oddTrOptions HTML options for odd TR elements if true useCount is used
  * @param array $evenTrOptions HTML options for even TR elements
  * @param bool $useCount adds class "column-$i"
+ * @param bool $continueOddEven If false, will use a non-static $count variable, so that the odd/even count is reset to zero just for that call
  * @return string	Formatted HTML
  */
-	function tableCells($data, $oddTrOptions = null, $evenTrOptions = null, $useCount = false) {
+	function tableCells($data, $oddTrOptions = null, $evenTrOptions = null, $useCount = false, $continueOddEven = true) {
 		if (empty($data[0]) || !is_array($data[0])) {
 			$data = array($data);
 		}
-		static $count = 0;
 
 		if ($oddTrOptions === true) {
 			$useCount = true;
 			$oddTrOptions = null;
 		}
+
+		if ($evenTrOptions === false) {
+			$continueOddEven = false;
+			$evenTrOptions = null;
+		}
+
+		if ($continueOddEven) {
+			static $count = 0;
+		} else {
+			$count = 0;
+	    }
+
 		foreach ($data as $line) {
 			$count++;
 			$cellsOut = array();
@@ -520,7 +532,7 @@ class HtmlHelper extends AppHelper {
  * @param boolean $escape If true, $text will be HTML-escaped
  * @return string The formatted tag element
  */
-    function tag($name, $text = null, $attributes = array(), $escape = false) {
+	function tag($name, $text = null, $attributes = array(), $escape = false) {
 		if ($escape) {
 			$text = h($text);
 		}
@@ -650,9 +662,9 @@ class HtmlHelper extends AppHelper {
 
 		foreach ($options as $optValue => $optTitle) {
 			$optionsHere = array('value' => $optValue);
- 	        if (!empty($value) && $optValue == $value) {
- 	        	$optionsHere['checked'] = 'checked';
- 	        }
+			if (!empty($value) && $optValue == $value) {
+				$optionsHere['checked'] = 'checked';
+			}
 			$parsedOptions = $this->_parseAttributes(array_merge($htmlAttributes, $optionsHere), null, '', ' ');
 			$individualTagName = $this->field() . "_{$optValue}";
 			$out[] = sprintf($this->tags['radio'], $this->model(), $this->field(), $individualTagName, $parsedOptions, $optTitle);

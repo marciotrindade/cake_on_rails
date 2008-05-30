@@ -109,6 +109,20 @@ class AclComponentTest extends CakeTestCase {
 		$this->assertTrue($this->Acl->Aco->save());
 	}
 
+	function testAclCreateWithParent() {
+		$parent = $this->Acl->Aro->findByAlias('Peter', null, null, -1);
+		$this->Acl->Aro->create();
+		$this->Acl->Aro->save(array(
+			'alias' => 'Subordinate', 
+			'model' => 'User', 
+			'foreign_key' => 7,
+			'parent_id' => $parent['AroTwoTest']['id']
+		));
+		$result = $this->Acl->Aro->findByAlias('Subordinate', null, null, -1);
+		$this->assertEqual($result['AroTwoTest']['lft'], 16);
+		$this->assertEqual($result['AroTwoTest']['rght'], 17);
+	}
+
 	function testDbAclAllow() {
 		$this->assertFalse($this->Acl->check('Micheal', 'tpsReports', 'read'));
 		$this->assertTrue($this->Acl->allow('Micheal', 'tpsReports', array('read', 'delete', 'update')));
@@ -295,37 +309,37 @@ class AclComponentTest extends CakeTestCase {
 		$result = $this->Acl->_Instance->readConfigFile($iniFile);
 		$expected = array(
 			'admin' => array(
-	            'groups' => 'administrators',
-	            'allow' => '',
-	            'deny' => 'ads',
-	        ),
-	    	'paul' => array(
-	            'groups' => 'users',
-	            'allow' =>'',
-	            'deny' => '',
-	        ),
-    		'jenny' => array(
-	            'groups' => 'users',
-	            'allow' => 'ads',
-	            'deny' => 'images, files',
-	        ),
+				'groups' => 'administrators',
+				'allow' => '',
+				'deny' => 'ads',
+			),
+			'paul' => array(
+				'groups' => 'users',
+				'allow' =>'',
+				'deny' => '',
+			),
+			'jenny' => array(
+				'groups' => 'users',
+				'allow' => 'ads',
+				'deny' => 'images, files',
+			),
 			'nobody' => array(
 				'groups' => 'anonymous',
 				'allow' => '',
 				'deny' => '',
 			),
-	    	'administrators' => array(
-	            'deny' => '',
-	            'allow' => 'posts, comments, images, files, stats, ads',
-	        ),
-	    	'users' => array(
-	            'allow' => 'posts, comments, images, files',
-	            'deny' => 'stats, ads',
-	        ),
+			'administrators' => array(
+				'deny' => '',
+				'allow' => 'posts, comments, images, files, stats, ads',
+			),
+			'users' => array(
+				'allow' => 'posts, comments, images, files',
+				'deny' => 'stats, ads',
+			),
 			'anonymous' => array(
-	            'allow' => '',
-	            'deny' => 'posts, comments, images, files, stats, ads',
-        	),
+				'allow' => '',
+				'deny' => 'posts, comments, images, files, stats, ads',
+			),
 		);
 		$this->assertEqual($result, $expected);
 	}
