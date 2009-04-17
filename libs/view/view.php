@@ -841,7 +841,12 @@ class View extends Object {
 			$subDir = $this->layoutPath . DS;
 		}
 		$paths = $this->_paths($this->plugin);
-		$file = 'layouts' . DS . $subDir . $name;
+		
+		/*
+			TODO changed layout path
+		*/
+		//$file = 'layouts' . DS . $subDir . $name;
+		$file = $subDir . 'layouts' . DS . $name;
 
 		$exts = array($this->ext, '.ctp', '.thtml');
 		foreach ($paths as $path) {

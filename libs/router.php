@@ -80,7 +80,7 @@ class Router extends Object {
  * @access private
  */
 	var $__named = array(
-		'Action'	=> 'index|show|add|create|edit|update|remove|del|delete|view|item',
+		'Action'	=> 'index|show|add|create|edit|update|remove|del|delete|destroy|show|item',
 		'Year'		=> '[12][0-9]{3}',
 		'Month'		=> '0[1-9]|1[012]',
 		'Day'		=> '0[1-9]|[12][0-9]|3[01]',
@@ -125,10 +125,11 @@ class Router extends Object {
  */
 	var $__resourceMap = array(
 		array('action' => 'index',	'method' => 'GET',		'id' => false),
-		array('action' => 'view',	'method' => 'GET',		'id' => true),
+		array('action' => 'show',	'method' => 'GET',		'id' => true),
 		array('action' => 'add',	'method' => 'POST',		'id' => false),
 		array('action' => 'edit',	'method' => 'PUT', 		'id' => true),
 		array('action' => 'delete',	'method' => 'DELETE',	'id' => true),
+		array('action' => 'destroy',	'method' => 'DELETE',	'id' => true),
 		array('action' => 'edit',	'method' => 'POST', 	'id' => true)
 	);
 /**

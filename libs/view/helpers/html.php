@@ -276,7 +276,7 @@ class HtmlHelper extends AppHelper {
  * @param  boolean $escapeTitle	Whether or not $title should be HTML escaped.
  * @return string	An <a /> element.
  */
-	function link($title, $url = null, $htmlAttributes = array(), $confirmMessage = false, $escapeTitle = true) {
+	function link($title, $url = null, $htmlAttributes = array(), $confirmMessage = false, $escapeTitle = false) {
 		if ($url !== null) {
 			$url = $this->url($url);
 		} else {
@@ -445,6 +445,19 @@ class HtmlHelper extends AppHelper {
 			$options['alt'] = '';
 		}
 
+		if (isset($options["size"])) {
+			$tmp = explode("x", $options["size"]);
+			if ($tmp[0])
+			{
+				$options["width"] = $tmp[0];
+			}
+			if ($tmp[1])
+			{
+				$options["height"] = $tmp[1];
+			}
+			unset($options["size"]);
+		}
+		
 		$url = false;
 		if (!empty($options['url'])) {
 			$url = $options['url'];

@@ -160,7 +160,7 @@ class TextHelper extends AppHelper {
  * @param boolean $considerHtml If true, HTML tags would be handled correctly
  * @return string Trimmed string.
  */
-	function truncate($text, $length = 100, $ending = '...', $exact = true, $considerHtml = false) {
+	function truncate($text, $length = 100, $ending = '...', $exact = false, $considerHtml = false) {
 		if (is_array($ending)) {
 			extract($ending);
 		}

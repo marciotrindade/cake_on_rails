@@ -141,7 +141,8 @@ class Dispatcher extends Object {
 
 		if (!empty($prefixes)) {
 			if (isset($this->params['prefix'])) {
-				$this->params['action'] = $this->params['prefix'] . '_' . $this->params['action'];
+				// commented by Marcio Trindade
+				//$this->params['action'] = $this->params['prefix'] . '_' . $this->params['action'];
 			} elseif (strpos($this->params['action'], '_') !== false && !$privateAction) {
 				list($prefix, $action) = explode('_', $this->params['action']);
 				$privateAction = in_array($prefix, $prefixes);
@@ -473,6 +474,18 @@ class Dispatcher extends Object {
 			$this->params['controller'] = $params['controller'];
 			$controller = Inflector::camelize($params['controller']);
 		}
+
+		// extra by Marcio Trindade
+		// separate controllers in folder by prefix
+		if (!empty($params["prefix"]))
+		{
+			App::import('Controller', $pluginPath . Inflector::camelize($params["prefix"]), true, array(APP . 'controllers' . DS . $params["prefix"] . DS));
+			if (App::import('Controller', $pluginPath . $controller, true, array(APP . 'controllers' . DS . $params["prefix"] . DS)))
+			{
+				return $controller;
+			}
+		}
+		
 		if ($pluginPath . $controller) {
 			if (App::import('Controller', $pluginPath . $controller)) {
 				return $controller;
