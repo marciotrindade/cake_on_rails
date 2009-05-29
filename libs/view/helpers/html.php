@@ -430,6 +430,7 @@ class HtmlHelper extends AppHelper {
  * @return string
  */
 	function image($path, $options = array()) {
+		$options = am(array('alt' => '', "absolute" => false), $options);
 		if (is_array($path)) {
 			$path = $this->url($path);
 		} elseif ($path[0] === '/') {
@@ -438,11 +439,7 @@ class HtmlHelper extends AppHelper {
 			if ((Configure::read('Asset.timestamp') == true && Configure::read() > 0) || Configure::read('Asset.timestamp') === 'force') {
 				$path .= '?' . @filemtime(str_replace('/', DS, WWW_ROOT . IMAGES_URL . $path));
 			}
-			$path = $this->webroot(IMAGES_URL . $path);
-		}
-
-		if (!isset($options['alt'])) {
-			$options['alt'] = '';
+			$path = $this->url("/" . IMAGES_URL . $path, $options["absolute"]);
 		}
 
 		if (isset($options["size"])) {
