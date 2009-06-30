@@ -442,6 +442,8 @@ class HtmlHelper extends AppHelper {
 			$path = $this->url("/" . IMAGES_URL . $path, $options["absolute"]);
 		}
 
+    unset($options["absolute"]);
+
 		if (isset($options["size"])) {
 			$tmp = explode("x", $options["size"]);
 			if ($tmp[0])
