@@ -42,7 +42,7 @@ class String extends Object {
 		static $instance = array();
 
 		if (!$instance) {
-			$instance[0] =& new String();
+			$instance[0] = new String();
 		}
 		return $instance[0];
 	}

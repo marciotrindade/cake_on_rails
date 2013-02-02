@@ -450,7 +450,7 @@ class Dispatcher extends Object {
 				$params = $this->_restructureParams($params, true);
 			}
 			$this->params = $params;
-			$controller =& new $ctrlClass();
+			$controller = new $ctrlClass();
 		}
 		return $controller;
 	}
@@ -686,7 +686,7 @@ class Dispatcher extends Object {
 					App::import('Core', 'View');
 				}
 				$controller = null;
-				$view =& new View($controller, false);
+				$view = new View($controller, false);
 				return $view->renderCache($filename, getMicrotime());
 			}
 		}
