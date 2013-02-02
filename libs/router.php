@@ -171,7 +171,7 @@ class Router extends Object {
 		static $instance = array();
 
 		if (!$instance) {
-			$instance[0] =& new Router();
+			$instance[0] = new Router();
 			$instance[0]->__admin = Configure::read('Routing.admin');
 		}
 		return $instance[0];

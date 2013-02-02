@@ -63,7 +63,7 @@ class ConnectionManager extends Object {
  */
 	function __construct() {
 		if (class_exists('DATABASE_CONFIG')) {
-			$this->config =& new DATABASE_CONFIG();
+			$this->config = new DATABASE_CONFIG();
 		}
 	}
 /**
@@ -77,7 +77,7 @@ class ConnectionManager extends Object {
 		static $instance = array();
 
 		if (!$instance) {
-			$instance[0] =& new ConnectionManager();
+			$instance[0] = new ConnectionManager();
 		}
 
 		return $instance[0];
@@ -103,7 +103,7 @@ class ConnectionManager extends Object {
 			$conn = $connections[$name];
 			$class = $conn['classname'];
 			$_this->loadDataSource($name);
-			$_this->_dataSources[$name] =& new $class($_this->config->{$name});
+			$_this->_dataSources[$name] = new $class($_this->config->{$name});
 			$_this->_dataSources[$name]->configKeyName = $name;
 		} else {
 			trigger_error(sprintf(__("ConnectionManager::getDataSource - Non-existent data source %s", true), $name), E_USER_ERROR);
